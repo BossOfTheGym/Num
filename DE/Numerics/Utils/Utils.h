@@ -13,7 +13,7 @@ namespace Num
     {
         enum NormType : int
         {
-              CUBE
+              CUBE 
             , OCTO
             , SPHERE
         };
