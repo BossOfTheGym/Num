@@ -64,21 +64,21 @@ namespace Elliptic
 			, class LeftLowerCorner , class LeftLowerFunction
 			, class LeftUpperCorner , class LeftUpperFunction
 		>
-			SolutionT solve(
-				int nt, int nx, Scalar eps, int iterationLimit
-
-				, Equation&&                 equation, Function&&                     function
-
-				, LeftBound&&               leftBound, LeftBoundFunction&&   leftBoundFunction
-				, RightBound&&             rightBound, RightBoundFunction&& rightBoundFunction
-				, LowerBound&&             lowerBound, LowerBoundFunction&& lowerBoundFunction
-				, UpperBound&&             upperBound, UpperBoundFunction&& upperBoundFunction
-
-				, RightLowerCorner&& rightLowerCorner, RightLowerFunction&& rightLowerFunction
-				, RightUpperCorner&& rightUpperCorner, RightUpperFunction&& rightUpperFunction
-				, LeftLowerCorner&&   leftLowerCorner, LeftLowerFunction&&   leftLowerFunction
-				, LeftUpperCorner&&   leftUpperCorner, LeftUpperFunction&&   leftUpperFunction
-			)
+		SolutionT solve(
+			int nt, int nx, Scalar eps, int iterationLimit
+		
+			, Equation&&                 equation, Function&&                     function
+		
+			, LeftBound&&               leftBound, LeftBoundFunction&&   leftBoundFunction
+			, RightBound&&             rightBound, RightBoundFunction&& rightBoundFunction
+			, LowerBound&&             lowerBound, LowerBoundFunction&& lowerBoundFunction
+			, UpperBound&&             upperBound, UpperBoundFunction&& upperBoundFunction
+		
+			, RightLowerCorner&& rightLowerCorner, RightLowerFunction&& rightLowerFunction
+			, RightUpperCorner&& rightUpperCorner, RightUpperFunction&& rightUpperFunction
+			, LeftLowerCorner&&   leftLowerCorner, LeftLowerFunction&&   leftLowerFunction
+			, LeftUpperCorner&&   leftUpperCorner, LeftUpperFunction&&   leftUpperFunction
+		)
 		{
 			//common parameters
 			auto prevSolution = std::make_unique<SolutionT>(nt + 1, nx + 1, 0.0);
@@ -160,7 +160,7 @@ namespace Elliptic
 
 					next[i][j] = innerValue / inner[1][1];
 				}
-
+				 
 				//right bound
 				auto rBound      = rightBound(i);
 				auto rBoundValue = rightBoundFunction(i);
@@ -282,21 +282,21 @@ namespace Elliptic
 			, class LeftLowerCorner , class LeftLowerFunction
 			, class LeftUpperCorner , class LeftUpperFunction
 		>
-			SolutionT solve(
-				int nt, int nx, Scalar eps, int iterationLimit
+		SolutionT solve(
+			int nt, int nx, Scalar eps, int iterationLimit
 
-				, Equation&&                 equation, Function&&                     function
+			, Equation&&                 equation, Function&&                     function
 
-				, LeftBound&&               leftBound, LeftBoundFunction&&   leftBoundFunction
-				, RightBound&&             rightBound, RightBoundFunction&& rightBoundFunction
-				, LowerBound&&             lowerBound, LowerBoundFunction&& lowerBoundFunction
-				, UpperBound&&             upperBound, UpperBoundFunction&& upperBoundFunction
+			, LeftBound&&               leftBound, LeftBoundFunction&&   leftBoundFunction
+			, RightBound&&             rightBound, RightBoundFunction&& rightBoundFunction
+			, LowerBound&&             lowerBound, LowerBoundFunction&& lowerBoundFunction
+			, UpperBound&&             upperBound, UpperBoundFunction&& upperBoundFunction
 
-				, RightLowerCorner&& rightLowerCorner, RightLowerFunction&& rightLowerFunction
-				, RightUpperCorner&& rightUpperCorner, RightUpperFunction&& rightUpperFunction
-				, LeftLowerCorner&&   leftLowerCorner, LeftLowerFunction&&   leftLowerFunction
-				, LeftUpperCorner&&   leftUpperCorner, LeftUpperFunction&&   leftUpperFunction
-			)
+			, RightLowerCorner&& rightLowerCorner, RightLowerFunction&& rightLowerFunction
+			, RightUpperCorner&& rightUpperCorner, RightUpperFunction&& rightUpperFunction
+			, LeftLowerCorner&&   leftLowerCorner, LeftLowerFunction&&   leftLowerFunction
+			, LeftUpperCorner&&   leftUpperCorner, LeftUpperFunction&&   leftUpperFunction
+		)
 		{
 			//common parameters
 			auto solution = SolutionT(nt + 1, nx + 1, 0.0);
@@ -526,21 +526,21 @@ namespace Elliptic
 			, class LeftLowerCorner , class LeftLowerFunction
 			, class LeftUpperCorner , class LeftUpperFunction
 		>
-			SolutionT solve(
-				int nt, int nx, Scalar eps, int iterationLimit
+		SolutionT solve(
+			int nt, int nx, Scalar eps, int iterationLimit
 
-				, Equation&&                 equation, Function&&                     function
+			, Equation&&                 equation, Function&&                     function
 
-				, LeftBound&&               leftBound, LeftBoundFunction&&   leftBoundFunction
-				, RightBound&&             rightBound, RightBoundFunction&& rightBoundFunction
-				, LowerBound&&             lowerBound, LowerBoundFunction&& lowerBoundFunction
-				, UpperBound&&             upperBound, UpperBoundFunction&& upperBoundFunction
+			, LeftBound&&               leftBound, LeftBoundFunction&&   leftBoundFunction
+			, RightBound&&             rightBound, RightBoundFunction&& rightBoundFunction
+			, LowerBound&&             lowerBound, LowerBoundFunction&& lowerBoundFunction
+			, UpperBound&&             upperBound, UpperBoundFunction&& upperBoundFunction
 
-				, RightLowerCorner&& rightLowerCorner, RightLowerFunction&& rightLowerFunction
-				, RightUpperCorner&& rightUpperCorner, RightUpperFunction&& rightUpperFunction
-				, LeftLowerCorner&&   leftLowerCorner, LeftLowerFunction&&   leftLowerFunction
-				, LeftUpperCorner&&   leftUpperCorner, LeftUpperFunction&&   leftUpperFunction
-			)
+			, RightLowerCorner&& rightLowerCorner, RightLowerFunction&& rightLowerFunction
+			, RightUpperCorner&& rightUpperCorner, RightUpperFunction&& rightUpperFunction
+			, LeftLowerCorner&&   leftLowerCorner, LeftLowerFunction&&   leftLowerFunction
+			, LeftUpperCorner&&   leftUpperCorner, LeftUpperFunction&&   leftUpperFunction
+		)
 		{
 			//common parameters
 			auto solution = SolutionT(nt + 1, nx + 1, 0.0);
@@ -636,7 +636,7 @@ namespace Elliptic
 
 					innerValue -=
 						+ solution[i + 1][j - 1] * inner[2][0] + solution[i + 1][j] * inner[2][1] + solution[i + 1][j + 1] * inner[2][2] 
-						+ solution[i    ][j - 1] * inner[1][0] +                              + solution[i    ][j + 1] * inner[1][2] 
+						+ solution[i    ][j - 1] * inner[1][0] +                                  + solution[i    ][j + 1] * inner[1][2] 
 						+ solution[i - 1][j - 1] * inner[0][0] + solution[i - 1][j] * inner[0][1] + solution[i - 1][j + 1] * inner[0][2];
 
 					solution[i][j] = innerValue * w / inner[1][1] + solution[i][j] * (static_cast<Scalar>(1) - w);
@@ -688,7 +688,7 @@ namespace Elliptic
 					prev = solution[nt][j];
 
 					uBoundValue -= 
-						+ solution[nt    ][j - 1] * uBound[1][0] +                                + solution[nt    ][j + 1] * uBound[1][2] 
+						+ solution[nt    ][j - 1] * uBound[1][0] +                                    + solution[nt    ][j + 1] * uBound[1][2] 
 						+ solution[nt - 1][j - 1] * uBound[0][0] + solution[nt - 1][j] * uBound[0][1] + solution[nt - 1][j + 1] * uBound[0][2];
 
 					solution[nt][j] = uBoundValue * w / uBound[1][1] + solution[nt][j] * (static_cast<Scalar>(1) - w);
