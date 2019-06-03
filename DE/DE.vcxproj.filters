@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Numerics\MP\Elliptic\Cache.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Numerics\MP\Elliptic\Elliptic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Numerics\MP\Parabolic\Parabolic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Numerics\MP\Utility\Rect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Numerics\MP\Parabolic\SolverRect2x3_1.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Numerics\MP\Elliptic\SolverRect3x3_1.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Numerics\MP\Utility\Template.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Numerics\MP\Utility\Utility.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Numerics\Arg\Arg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Numerics\Arg\ArgN.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Numerics\Common\Common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Numerics\Equ\Common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Numerics\Equ\FixedPoint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Numerics\Equ\Neuton.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Numerics\Ivp\Common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Numerics\Ivp\RungeKutta.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Numerics\LinAlg\Common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Numerics\LinAlg\Gauss.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Numerics\Utils\Utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
