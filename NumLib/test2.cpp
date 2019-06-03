@@ -4,9 +4,9 @@
 #include <string>
 #include <algorithm>
 
-#include "Utility/Utility.h"
-#include "Elliptic/Elliptic.h"
-#include "Parabolic/Parabolic.h"
+#include "Numerics/MP/Utility/Utility.h"
+#include "Numerics/MP/Elliptic/Elliptic.h"
+#include "Numerics/MP/Parabolic/Parabolic.h"
 
 
 using Rect = Utility::Rect<double>;
@@ -40,52 +40,6 @@ double testSolution(int nt, int nx, const Solution& numerical, TestFunction&& so
 	}
 
 	return diff;
-}
-
-
-template<class Solution, class Stream>
-void writeSolutionToStream(
-	const Solution& solution
-	, int nt, int nx
-	, double x0, double t0
-	, double ht, double hx
-	, Stream& os
-)
-{
-	os << nt << " " << nx << std::endl;
-	os << t0 << " " << x0 << std::endl;
-	os << ht << " " << hx << std::endl;
-
-	for (auto& elem : solution)
-	{
-		os << elem << " ";
-	}
-}
-
-
-template<class Solution, class Stream>
-void writeSolutionToStreamCompressed(
-	const Solution& solution
-	, int nt, int nx
-	, double x0, double t0
-	, double ht, double hx
-	, int ratio_t, int ratio_x
-	, Stream& os
-)
-{
-	os << nt / ratio_t << " " << nx / ratio_x << std::endl;
-
-	os << t0 << " " << x0 << std::endl;
-
-	os << ht * ratio_t << " " << hx * ratio_x << std::endl;
-
-	for (int i = 0; i <= nt; i += ratio_t)
-	{
-		for (int j = 0; j <= nx; j += ratio_x)
-		{
-			os << solution[i][j] << " ";
-		}
-	}
 }
 
 
@@ -712,30 +666,6 @@ void testBalance()
 
 }
 
-double test()
-{
-	std::vector<double> a(10000000);
-
-	double b = 0.0;
-	for (int k = 0; k < 10; k++)
-	{
-		for (int i = 0; i < 10000000; i++)
-		{
-			a[i] = 1.0;
-			b += a[i];
-			a[i] += b;
-		}
-
-	}
-
-	auto p = &a;
-	auto pb = &b;
-
-	std::cout << p << std::endl;
-	std::cout << pb << std::endl;
-
-	return *pb;
-}
 
 int main()
 {
