@@ -54,8 +54,8 @@ void testElliptic()
 	const double dx = x1 - x0;
 	const double dt = t1 - t0;
 
-	const int nx = 100;
-	const int nt = 100;
+	const int nx = 256;
+	const int nt = 256;
 
 	const double hx = dx / nx;
 	const double ht = dt / nt;
@@ -65,6 +65,7 @@ void testElliptic()
 
 	
 	//basic functions
+	
 	auto function = [&] (double t, double x)
 	{
 		return 2.0 * std::exp(-(t + x));
@@ -169,7 +170,7 @@ void testElliptic()
 
 		equ[2][0] = 0.0; equ[2][1] = b - c; equ[2][2] = c;
 		equ[1][0] = 0.0; equ[1][1] = -a - 2 * b + 2 * c; equ[1][2] = a - 2 * c;
-		equ[0][0] = 0.0; equ[0][1] = b - c; equ[0][2] = c;
+		equ[0][0] = 0.0                                                 ; equ[0][1] = b - c; equ[0][2] = c;
 
 		return equ;
 	};
@@ -368,8 +369,8 @@ void testElliptic()
 
 	auto solve2 = [&] (auto&& solver) -> decltype(auto)
 	{
-		const int limit = nt * nx * 2;
-		const double eps = ht2 * hx2 / 100;
+		const int limit = 1000;//nt * nx * 2;
+		const double eps = ht2 * hx2 / 500;
 
 		return Elliptic::solveCached(
 			cache, solver
@@ -391,8 +392,8 @@ void testElliptic()
 
 	auto solve4 = [&] (auto&& solver) -> decltype(auto)
 	{
-		const int limit = nt * nx * 2;
-		const double eps = ht2 * hx2 / 100;
+		const int limit = 1000;//nt * nx * 2;
+		const double eps = ht2 * hx2 / 500;
 
 		return Elliptic::solveCached(
 			cache, solver
@@ -416,51 +417,55 @@ void testElliptic()
 	//solvers
 	//4-th order
 	//Jacoby iterations
-	auto solver1 = EllipticSolverSimple();
-	auto numerical = solve4(solver1);
+	//auto solver1 = EllipticSolverSimple();
+	//auto numerical = solve4(solver1);
 
-	auto diff1 = testSolution(nt, nx, numerical, solutionNet);
+	//auto diff1 = testSolution(nt, nx, numerical, solutionNet);
 
 	//Gauss-Zeidel method
-	auto solver2 = EllipticSolverZeidel();
-	numerical = solve4(solver2);
+	//auto solver2 = EllipticSolverZeidel();
+	//numerical = solve4(solver2);
 
-	auto diff2 = testSolution(nt, nx, numerical, solutionNet);
+	//auto diff2 = testSolution(nt, nx, numerical, solutionNet);
 
 	//relaxation
-	auto solver3 = EllipticSolverRelaxation(1.5);
-	numerical = solve4(solver3);
+	//auto solver3 = EllipticSolverRelaxation(1.5);
+	//numerical = solve4(solver3);
 
-	auto diff3 = testSolution(nt, nx, numerical, solutionNet);
+	auto solver = EllipticSolverRelaxation(1.5);
+	auto numerical = solve4(solver);
+	auto diff4 = testSolution(nt, nx, numerical, solutionNet);
 
 	//result
-	std::cout << "4-th order errors" << std::endl;
-	std::cout << diff1 << " " << diff2 << " " << diff3 << std::endl;
-	std::cin.get();
+	//std::cout << "4-th order errors" << std::endl;
+	//std::cout << diff1 << " " << diff2 << " " << diff3 << std::endl;
 
 	//2-nd order
 	//Jacoby iterations
-	numerical = solve2(solver1);
-
-	diff1 = testSolution(nt, nx, numerical, solutionNet);
+	//numerical = solve2(solver1);
+	
+	//diff1 = testSolution(nt, nx, numerical, solutionNet);
 
 	//Gauss-Zeidel method	
-	numerical = solve2(solver2);
+	//numerical = solve2(solver2);
 
-	diff2 = testSolution(nt, nx, numerical, solutionNet);
+	//diff2 = testSolution(nt, nx, numerical, solutionNet);
 
 	//relaxation
-	numerical = solve2(solver3);
-
-	diff3 = testSolution(nt, nx, numerical, solutionNet);
+	numerical = solve2(solver);
+	auto diff2 = testSolution(nt, nx, numerical, solutionNet);
 
 	//result
-	std::cout << "2-th order errors" << std::endl;
-	std::cout << diff1 << " " << diff2 << " " << diff3 << std::endl;
+	//std::cout << "2-th order errors" << std::endl;
+	//std::cout << diff1 << " " << diff2 << " " << diff3 << std::endl;
+	std::cout << "Errors: " << std::endl;
+	std::cout << "2-nd order: " << diff2 << std::endl;
+	std::cout << "4-th order: " << diff4 << std::endl;
 	std::cin.get();
 }
 
 
+//TODO: parabolic solver should be reworked
 void testParabolic()
 {	
 	const double PI  = std::acos(-1);
@@ -474,8 +479,8 @@ void testParabolic()
 	const double dt = t1 - t0;
 	const double dx = x1 - x0;
 	
-	const int nt = 10000;
-	const int nx = 10000;
+	const int nt = 1000;
+	const int nx = 1000;
 	
 	const double ht = dt / nt;
 	const double hx = dx / nx;
@@ -489,7 +494,7 @@ void testParabolic()
 		return SQ2 * std::sin(PI / 4 + t + x);
 	};
 
-	//TEST
+
 	auto leftBoundFunction = [&] (double t)
 	{
 		return std::sin(t);
@@ -508,13 +513,9 @@ void testParabolic()
 
 
 	//equations
-	//TEST
-	auto equation2 = [&] (int i, int j)
+	auto weighted = [&] (double sigma)
 	{
 		Template2x3 equ;
-
-		double alpha = 0.0;
-		double sigma = 0.5 + alpha * hx2 / ht;
 
 		double a = sigma / hx2;
 		double b = (1.0 - sigma) / hx2;
@@ -526,21 +527,19 @@ void testParabolic()
 		return equ;
 	};
 
-	//TEST
+	auto equation2 = [&] (int i, int j)
+	{
+		double alpha = 0.0;
+		double sigma = 0.5 + alpha * hx2 / ht;
+
+		return weighted(sigma);
+	};
+
 	auto equation4 = [&] (int i, int j)
 	{
-		Template2x3 equ;
-
 		double sigma = 0.5 - hx2 / (12.0 * ht);
 
-		double a = sigma / hx2;
-		double b = (1.0 - sigma) / hx2;
-		double c = 1.0 / ht;
-
-		equ[1][0] = -a; equ[1][1] = +c + 2 * a; equ[1][2] = -a;
-		equ[0][0] = -b; equ[0][1] = -c + 2 * b; equ[0][2] = -b;
-
-		return equ;
+		return weighted(sigma);
 	};
 
 
@@ -585,6 +584,7 @@ void testParabolic()
 
 		return f11 + (f21 - f01) / 4;
 	};
+
 	auto functionHO4 = [&] (int i, int j)
 	{
 		double f21 = function(t0 + ht * (i + 1), x0 + hx * j);
@@ -661,17 +661,13 @@ void testParabolic()
 }
 
 
-void testBalance()
-{
-
-}
-
-
 int main()
 {
 	testElliptic();
 	
 	//testParabolic();
+
+	//nikitoz();
 
 	return 0;
 }

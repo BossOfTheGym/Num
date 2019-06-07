@@ -253,6 +253,7 @@ namespace Elliptic
 			}
 			while (norm() > eps && iterations < iterationLimit);
 
+			//TODO: remove this
 			std::cout << iterations << std::endl;
 
 			return SolutionT(std::move(*nextSolution));
@@ -484,6 +485,7 @@ namespace Elliptic
 			}
 			while (norm > eps && iterations < iterationLimit);
 
+			//TODO: remove this
 			std::cout << iterations << std::endl;
 
 			return std::move(solution);
@@ -718,6 +720,13 @@ namespace Elliptic
 			{
 				++iterations;
 
+				//TODO: remove this
+				if (iterations % 1000 == 0)
+				{
+					std::cout << iterations << std::endl;
+				}
+
+
 				norm = static_cast<Scalar>(0);
 
 				firstLayerStep();
@@ -729,6 +738,7 @@ namespace Elliptic
 			}
 			while (norm > eps && iterations < iterationLimit);
 
+			//TODO: and this
 			std::cout << iterations << std::endl;
 
 			return std::move(solution);

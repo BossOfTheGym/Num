@@ -92,7 +92,7 @@ namespace Parabolic
 			auto initializeCurrentSystem = [&] (int i)
 			{
 				//left bound
-				auto rb = rightBound(i);
+				auto rb = leftBound(i);
 				block[0][0] = rb[1][0];
 				block[0][1] = rb[1][1];
 				block[0][2] = rb[1][2];
@@ -111,7 +111,7 @@ namespace Parabolic
 				}
 
 				//right bound
-				auto lb = leftBound(i);
+				auto lb = rightBound(i);
 				block[nx][0] = lb[1][0];
 				block[nx][1] = lb[1][1];
 				block[nx][2] = lb[1][2];
