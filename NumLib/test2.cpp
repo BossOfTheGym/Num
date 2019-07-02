@@ -54,8 +54,8 @@ void testElliptic()
 	const double dx = x1 - x0;
 	const double dt = t1 - t0;
 
-	const int nx = 256;
-	const int nt = 256;
+	const int nx = 1000;
+	const int nt = 1000;
 
 	const double hx = dx / nx;
 	const double ht = dt / nt;
@@ -369,8 +369,8 @@ void testElliptic()
 
 	auto solve2 = [&] (auto&& solver) -> decltype(auto)
 	{
-		const int limit = 1000;//nt * nx * 2;
-		const double eps = ht2 * hx2 / 500;
+		const int limit = 300000;//nt * nx * 2;
+		const double eps = ht2 * hx2 / 100;
 
 		return Elliptic::solveCached(
 			cache, solver
@@ -392,8 +392,8 @@ void testElliptic()
 
 	auto solve4 = [&] (auto&& solver) -> decltype(auto)
 	{
-		const int limit = 1000;//nt * nx * 2;
-		const double eps = ht2 * hx2 / 500;
+		const int limit = 300000;//nt * nx * 2;
+		const double eps = ht2 * hx2 / 100;
 
 		return Elliptic::solveCached(
 			cache, solver
