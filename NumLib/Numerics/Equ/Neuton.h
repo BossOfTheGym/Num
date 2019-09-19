@@ -50,31 +50,6 @@ namespace Num
         };
 
 
-		template<class Value, class Function>
-		class DiffDerivative : public Function
-		{
-		public:
-			DiffDerivative(Function&& function, Value eps) 
-				: Function(std::forward<Function>(function))
-				, mEps(eps)
-			{}
-
-			DiffDerivative(const DiffDerivative& deriv) = default;
-			DiffDerivative(DiffDerivative&& deriv)      = default;
-
-
-		public:
-			Value operator()(const Value& arg)
-			{
-				return (Function::operator()(arg + mEps) - Function::operator()(arg - mEps)) / (2 * mEps);
-			}
-
-		private:
-			Value mEps;
-		};
-		
-
-
         template<
               class ScalarType
             , int N
@@ -95,6 +70,7 @@ namespace Num
             using Vector = VectorType<Scalar, N>;
 
 
+		public:
             NeutonSystem() : Base(), m_solver(), m_norm()
             {}
 
@@ -107,7 +83,7 @@ namespace Num
             NeutonSystem(NeutonSystem&& ns)      = default;
 
 
-
+		public:
 			template<class Function, class Jacobian>
             Root<Vector> solve(
                   Function&& func
@@ -153,57 +129,5 @@ namespace Num
             Norm   m_norm;
         };
 
-
-		template< 
-			  class Vector
-			, class Matrix
-			, class Function
-		>
-		class DiffJacobian : public Function
-		{
-			static_assert(Vector::SIZE == Matrix::COLS && Vector::SIZE == Matrix::ROWS, "Non-matching sizes");
-
-		public:
-			using Scalar = typename Vector::Scalar;
-
-		public:
-			DiffJacobian(Function&& function, Scalar&& eps) 
-				: Function(std::forward<Function>(function))
-				, mEps(eps)
-			{}
-
-			DiffJacobian(const DiffJacobian& dj) = default;
-			DiffJacobian(DiffJacobian&& dj)      = default;
-
-
-			Matrix operator() (const Vector& arg)
-			{
-				const int N = Vector::SIZE;
-
-				Matrix mat;
-
-				for(int i = 0; i < N; i++)
-				{
-					Vector rightArg(arg);
-					Vector  leftArg(arg);
-					rightArg[i] += mEps;
-					leftArg [i] -= mEps;
-					
-
-					Vector right = Function::operator()(rightArg);
-					Vector left  = Function::operator()(leftArg);
-					for (int j = 0; j < N; j++)
-					{
-						mat[j][i] = (right[j] - left[j]) / (2 * mEps);
-					}
-				}
-
-				return mat;
-			}
-
-
-		private:
-			Scalar mEps;
-		};
     }
 }

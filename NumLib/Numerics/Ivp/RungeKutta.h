@@ -2,9 +2,7 @@
 
 
 #include "Common.h"
-
 #include "../Equ/Neuton.h"
-
 
 namespace Num
 {
@@ -39,7 +37,7 @@ namespace Num
 
 
 		template<class Scalar>
-        struct Methods
+        struct ExplicitMethods
         {
             //+++++ explicit methods +++++
 
@@ -88,67 +86,11 @@ namespace Num
 			//     | 1/8 3/8 3/8 1/8
 			//s = 4
 			static ButcherTableau<Scalar, 4> three_eighths_rule4();
-
-
-            //+++++ implicit methods +++++
-
-			//tableau 1x1
-			//----------
-			//  1  |  1
-			//-----|----
-			//     |  1
-			//s = 1
-			static ButcherTableau<Scalar, 1> backwordEuler1();
-
-            //tableau 1x1
-			//----------
-			// 1/2 | 1/2
-			//-----|----
-			//     |  1
-			//s = 2
-			static ButcherTableau<Scalar, 1> midpoint2();
-
-
-            //tableau 2x2
-			// c1 = 1/2 - 1/6 * sqrt(3)
-			// c2 = 1/2 + 1/6 * sqrt(3)
-			//
-			// a12 = 1/4 - 1/6 * sqrt(3)
-			// a21 = 1/4 + 1/6 * sqrt(3)
-			//
-			//--------------
-			// c1 | 1/4 a12
-			// c2 | a21 1/4
-			//----|---------
-			//    | 1/2 1/2
-			//s = 4
-			static ButcherTableau<Scalar, 2> gaussLegendre4();
-
-
-            //tableau 3x3
-			// c1 = 1/2 - 1/10 * sqrt(15)
-			// c3 = 1/2 + 1/10 * sqrt(15)
-			//
-			// a12 = 2/9 - 1/15 * sqrt(15)
-			// a21 = 2/9 + 1/15 * sqrt(15)
-			//
-			// a13 = 5/36 - 1/30 * sqrt(15)
-			// a31 = 5/36 + 1/30 * sqrt(15)
-			//
-			// a23 = 5/36 - 1/24 * sqrt(15)
-			// a32 = 5/36 + 1/24 * sqrt(15)
-			//
-			//--------------------
-			// c1  | 5/36 a12 a13  
-			// 1/2 | a21  2/9 a23
-			// c3  | a31  a32 5/36
-			//-----|---------------
-			//     | 5/18 4/9 5/18
-			static ButcherTableau<Scalar, 3> gaussLegendre6();
         };
 
+
 		template<class Scalar>
-		ButcherTableau<Scalar, 3> Methods<Scalar>::heun3()
+		ButcherTableau<Scalar, 3> ExplicitMethods<Scalar>::heun3()
 		{
 			ButcherTableau<Scalar, 3> tableau;
 
@@ -165,7 +107,7 @@ namespace Num
 		}
 		
 		template<class Scalar>
-		ButcherTableau<Scalar, 4> Methods<Scalar>::classic4()
+		ButcherTableau<Scalar, 4> ExplicitMethods<Scalar>::classic4()
 		{
 			ButcherTableau<Scalar, 4> tableau;
 
@@ -186,7 +128,7 @@ namespace Num
 		}
 
 		template<class Scalar>
-		ButcherTableau<Scalar, 4> Methods<Scalar>::ralston4()
+		ButcherTableau<Scalar, 4> ExplicitMethods<Scalar>::ralston4()
 		{
 			ButcherTableau<Scalar, 4> tableau;
 
@@ -214,7 +156,7 @@ namespace Num
 		}
 
 		template<class Scalar>
-		ButcherTableau<Scalar, 4> Methods<Scalar>::three_eighths_rule4()
+		ButcherTableau<Scalar, 4> ExplicitMethods<Scalar>::three_eighths_rule4()
 		{
 			ButcherTableau<Scalar, 4> tableau;
 
@@ -238,8 +180,70 @@ namespace Num
 		}
 
 
+
 		template<class Scalar>
-		ButcherTableau<Scalar, 1> Methods<Scalar>::backwordEuler1()
+		struct ImplicitMethods
+		{
+			//+++++ implicit methods +++++
+
+			//tableau 1x1
+			//----------
+			//  1  |  1
+			//-----|----
+			//     |  1
+			//s = 1
+			static ButcherTableau<Scalar, 1> backwardEuler1();
+
+			//tableau 1x1
+			//----------
+			// 1/2 | 1/2
+			//-----|----
+			//     |  1
+			//s = 2
+			static ButcherTableau<Scalar, 1> midpoint2();
+
+
+			//tableau 2x2
+			// c1 = 1/2 - 1/6 * sqrt(3)
+			// c2 = 1/2 + 1/6 * sqrt(3)
+			//
+			// a12 = 1/4 - 1/6 * sqrt(3)
+			// a21 = 1/4 + 1/6 * sqrt(3)
+			//
+			//--------------
+			// c1 | 1/4 a12
+			// c2 | a21 1/4
+			//----|---------
+			//    | 1/2 1/2
+			//s = 4
+			static ButcherTableau<Scalar, 2> gaussLegendre4();
+
+
+			//tableau 3x3
+			// c1 = 1/2 - 1/10 * sqrt(15)
+			// c3 = 1/2 + 1/10 * sqrt(15)
+			//
+			// a12 = 2/9 - 1/15 * sqrt(15)
+			// a21 = 2/9 + 1/15 * sqrt(15)
+			//
+			// a13 = 5/36 - 1/30 * sqrt(15)
+			// a31 = 5/36 + 1/30 * sqrt(15)
+			//
+			// a23 = 5/36 - 1/24 * sqrt(15)
+			// a32 = 5/36 + 1/24 * sqrt(15)
+			//
+			//--------------------
+			// c1  | 5/36 a12 a13  
+			// 1/2 | a21  2/9 a23
+			// c3  | a31  a32 5/36
+			//-----|---------------
+			//     | 5/18 4/9 5/18
+			static ButcherTableau<Scalar, 3> gaussLegendre6();
+		};
+
+
+		template<class Scalar>
+		ButcherTableau<Scalar, 1> ImplicitMethods<Scalar>::backwardEuler1()
 		{
 			ButcherTableau<Scalar, 1> tableau;
 
@@ -253,7 +257,7 @@ namespace Num
 		}
 
 		template<class Scalar>
-		ButcherTableau<Scalar, 1> Methods<Scalar>::midpoint2()
+		ButcherTableau<Scalar, 1> ImplicitMethods<Scalar>::midpoint2()
 		{
 			ButcherTableau<Scalar, 1> tableau;
 
@@ -267,7 +271,7 @@ namespace Num
 		}
 
 		template<class Scalar>
-		ButcherTableau<Scalar, 2> Methods<Scalar>::gaussLegendre4()
+		ButcherTableau<Scalar, 2> ImplicitMethods<Scalar>::gaussLegendre4()
 		{
 			ButcherTableau<Scalar, 2> tableau;
 
@@ -286,7 +290,7 @@ namespace Num
 		}
 
 		template<class Scalar>
-		ButcherTableau<Scalar, 3> Methods<Scalar>::gaussLegendre6()
+		ButcherTableau<Scalar, 3> ImplicitMethods<Scalar>::gaussLegendre6()
 		{
 			ButcherTableau<Scalar, 3> tableau;
 
@@ -318,7 +322,7 @@ namespace Num
 		}
 
 
-
+		//TODO: add specialization for SYSTEM_ORDER = 1
         //unified for both Scalar & System
         template<
 			  int SYSTEM_ORDER
@@ -330,15 +334,14 @@ namespace Num
         class RungeKuttaExplicit
         {
         public:
-            using NextNode = Node<Argument, Value>;
 			using Vector   = VectorType<Value, Tableau::ORDER>;
 
-
+		public:
 			RungeKuttaExplicit(Tableau&& tableau) : m_tableau(std::forward<Tableau>(tableau))
 			{}
 
 			template<class Function>
-			NextNode solve(
+			Value solve(
 				  Function&& func
 				, const Argument& arg0
 				, const Value& val0
@@ -364,7 +367,7 @@ namespace Num
 					sum += bVec[i] * kVec[i];
 				}
 
-				return {arg0 + h, val0 + h * sum};
+				return val0 + h * sum;
 			}
 		
 
@@ -373,7 +376,7 @@ namespace Num
         };
 
 
-
+		//TODO: add specialization for SYSTEM_ORDER = 1
         //unified for both Scalar & System
 		template<
 			  int SYSTEM_ORDER
@@ -387,9 +390,6 @@ namespace Num
         class RungeKuttaImplicit
         {
         public:
-			using NextNode = Node<Argument, Value>;
-
-
 			RungeKuttaImplicit(
 				  Tableau&& tableau
 				, Argument&& eps
@@ -401,7 +401,7 @@ namespace Num
 
 
 			template<class Function, class Jacobian>
-			NextNode solve(
+			Value solve(
 				  Function&& func
 				, Jacobian&& jacobian
 				, const Argument& arg0
@@ -534,7 +534,7 @@ namespace Num
 				}
 
 
-				return {arg0 + h, val0 + h * sum};
+				return val0 + h * sum;
 			}
 
 
@@ -555,76 +555,5 @@ namespace Num
 			Tableau m_tableau;
         };
 
-
-
-		template<class Argument, class Value, class Function>
-		class DiffDerivative : public Function
-		{
-		public:
-			DiffDerivative(Function&& function, Value&& eps) 
-				: Function(std::forward<Function>(function))
-				, mEps(eps)
-			{}
-
-			DiffDerivative(const DiffDerivative& deriv) = default;
-			DiffDerivative(DiffDerivative&& deriv)      = default;
-
-
-		public:
-			Value operator()(const Argument& arg, const Value& val)
-			{
-				auto bound = [&] (const Value& value)
-				{
-					return Function::operator()(arg, value);
-				};
-
-				return Equ::DiffDerivative(bound, mEps)(val);
-			}
-
-		private:
-			Value mEps;
-		};
-
-
-		template< 
-			  class Vector
-			, class Matrix
-			, class Function
-		>
-			class DiffJacobian : public Function
-		{
-			static_assert(Vector::SIZE == Matrix::COLS && Vector::SIZE == Matrix::ROWS, "Non-matching sizes");
-
-
-		public:
-			using Scalar = typename Vector::Scalar;
-
-
-		public:
-			DiffJacobian(Function&& function, Scalar&& eps) 
-				: Function(std::forward<Function>(function))
-				, mEps(eps)
-			{}
-
-			DiffJacobian(const DiffJacobian& dj) = default;
-			DiffJacobian(DiffJacobian&& dj)      = default;
-
-
-			Matrix operator() (const Scalar& arg, const Vector& val)
-			{
-				const int N = Vector::SIZE;
-
-				auto bound = [&] (const Vector& value) -> decltype(auto)
-				{
-					return Function::operator()(arg, value);
-				};
-
-				return Equ::DiffJacobian<Vector, Matrix, decltype(bound)>(std::move(bound), std::move(mEps))(val);
-			}
-
-
-		private:
-			Scalar mEps;
-		};
     }
 }

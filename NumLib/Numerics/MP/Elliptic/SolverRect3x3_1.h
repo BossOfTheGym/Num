@@ -19,7 +19,7 @@ namespace Elliptic
 	//Solvers for rectangular region for template 3x3, 1 dimensional variable
 	//
 	// equation = function (all coefs are from the left, all values are from the right)
-	// t(i)
+	// x2(j)
 	// ^
 	// |
 	// |  (i + 1, j - 1)  (i + 1, j)  (i + 1, j + 1)        _____
@@ -28,14 +28,14 @@ namespace Elliptic
 	// |                                                  0|_____| previous layer
 	// |  (i - 1, j - 1)  (i - 1, j)  (i + 1, j + 1)        0 1 2
 	// |
-	//  ---------------------------------------------> x(j)
+	//  ---------------------------------------------> x1(i)
 	//
 	//class Equation        , class Function            - takes (i, j) -> Template / Value
 	//
-	//class LeftBound       , class LeftBoundFunction   - takes (i,  ) -> Template / Value
-	//class RightBound      , class RightBoundFunction  - takes (i,  ) -> Template / Value
-	//class LowerBound      , class LowerBoundFunction  - takes ( , j) -> Template / Value
-	//class UpperBound      , class UpperBoundFunction  - takes ( , j) -> Template / Value
+	//class LeftBound       , class LeftBoundFunction   - takes ( , j) -> Template / Value
+	//class RightBound      , class RightBoundFunction  - takes ( , j) -> Template / Value
+	//class LowerBound      , class LowerBoundFunction  - takes (i,  ) -> Template / Value
+	//class UpperBound      , class UpperBoundFunction  - takes (i,  ) -> Template / Value
 	//
 	//class RightLowerCorner, class RightLowerFunction  - takes (void) -> Template / Value
 	//class RightUpperCorner, class RightUpperFunction  - takes (void) -> Template / Value
@@ -65,7 +65,7 @@ namespace Elliptic
 			, class LeftUpperCorner , class LeftUpperFunction
 		>
 		SolutionT solve(
-			int nt, int nx, Scalar eps, int iterationLimit
+			int nx1, int nx2, Scalar eps, int iterationLimit
 		
 			, Equation&&                 equation, Function&&                     function
 		
@@ -81,8 +81,8 @@ namespace Elliptic
 		)
 		{
 			//common parameters
-			auto prevSolution = std::make_unique<SolutionT>(nt + 1, nx + 1, 0.0);
-			auto nextSolution = std::make_unique<SolutionT>(nt + 1, nx + 1, 0.0);
+			auto prevSolution = std::make_unique<SolutionT>(nx1 + 1, nx2 + 1, 0.0);
+			auto nextSolution = std::make_unique<SolutionT>(nx1 + 1, nx2 + 1, 0.0);
 
 			int i = 0;
 
@@ -106,7 +106,7 @@ namespace Elliptic
 				next[0][0] = llCornerValue / llCorner[1][1];
 
 				//lower bound
-				for (int j = 1; j < nx; j++)
+				for (int j = 1; j < nx2; j++)
 				{
 					auto lBound      = lowerBound(j);
 					auto lBoundValue = lowerBoundFunction(j);
@@ -123,10 +123,10 @@ namespace Elliptic
 				auto rlCornerValue = rightLowerFunction();
 
 				rlCornerValue -=
-					+ prev[1][nx - 1] * rlCorner[2][0] + prev[1][nx] * rlCorner[2][1] 
-					+ prev[0][nx - 1] * rlCorner[1][0]                               ;
+					+ prev[1][nx2 - 1] * rlCorner[2][0] + prev[1][nx2] * rlCorner[2][1] 
+					+ prev[0][nx2 - 1] * rlCorner[1][0]                               ;
 
-				next[0][nx] = rlCornerValue / rlCorner[1][1];	
+				next[0][nx2] = rlCornerValue / rlCorner[1][1];	
 			};
 
 
@@ -148,7 +148,7 @@ namespace Elliptic
 				next[i][0] = lBoundValue / lBound[1][1];
 
 				//inner
-				for (int j = 1; j < nx; j++)
+				for (int j = 1; j < nx2; j++)
 				{
 					auto inner      = equation(i, j);
 					auto innerValue = function(i, j);
@@ -166,11 +166,11 @@ namespace Elliptic
 				auto rBoundValue = rightBoundFunction(i);
 
 				rBoundValue -=
-					+ prev[i + 1][nx - 1] * rBound[2][0] + prev[i + 1][nx] * rBound[2][1]
-					+ prev[i    ][nx - 1] * rBound[1][0] +
-					+ prev[i - 1][nx - 1] * rBound[0][0] + prev[i - 1][nx] * rBound[0][1];
+					+ prev[i + 1][nx2 - 1] * rBound[2][0] + prev[i + 1][nx2] * rBound[2][1]
+					+ prev[i    ][nx2 - 1] * rBound[1][0] +
+					+ prev[i - 1][nx2 - 1] * rBound[0][0] + prev[i - 1][nx2] * rBound[0][1];
 
-				next[i][nx] = rBoundValue / rBound[1][1];
+				next[i][nx2] = rBoundValue / rBound[1][1];
 			};
 
 
@@ -185,22 +185,22 @@ namespace Elliptic
 				auto luCornerValue = leftUpperFunction();
 
 				luCornerValue -=
-					+                                  + prev[nt    ][1] * luCorner[1][2] 
-					+ prev[nt - 1][0] * luCorner[0][1] + prev[nt - 1][1] * luCorner[0][2];
+					+                                  + prev[nx1    ][1] * luCorner[1][2] 
+					+ prev[nx1 - 1][0] * luCorner[0][1] + prev[nx1 - 1][1] * luCorner[0][2];
 
-				next[nt][0] = luCornerValue / luCorner[1][1];;
+				next[nx1][0] = luCornerValue / luCorner[1][1];;
 
 				// upper bound
-				for (int j = 1; j < nx; j++)
+				for (int j = 1; j < nx2; j++)
 				{
 					auto uBound      = upperBound(j);
 					auto uBoundValue = upperBoundFunction(j);
 
 					uBoundValue -=
-						+ prev[nt    ][j - 1] * uBound[1][0] +                                + prev[nt    ][j + 1] * uBound[1][2] 
-						+ prev[nt - 1][j - 1] * uBound[0][0] + prev[nt - 1][j] * uBound[0][1] + prev[nt - 1][j + 1] * uBound[0][2];
+						+ prev[nx1    ][j - 1] * uBound[1][0] +                                + prev[nx1    ][j + 1] * uBound[1][2] 
+						+ prev[nx1 - 1][j - 1] * uBound[0][0] + prev[nx1 - 1][j] * uBound[0][1] + prev[nx1 - 1][j + 1] * uBound[0][2];
 
-					next[nt][j] = uBoundValue / uBound[1][1];
+					next[nx1][j] = uBoundValue / uBound[1][1];
 				}
 
 
@@ -209,10 +209,10 @@ namespace Elliptic
 				auto ruCornerValue = rightUpperFunction();
 
 				ruCornerValue -=
-					+ prev[nt    ][nx - 1] * ruCorner[1][0] + 
-					+ prev[nt - 1][nx - 1] * ruCorner[0][0] + prev[nt - 1][nx] * ruCorner[0][1];
+					+ prev[nx1    ][nx2 - 1] * ruCorner[1][0] + 
+					+ prev[nx1 - 1][nx2 - 1] * ruCorner[0][0] + prev[nx1 - 1][nx2] * ruCorner[0][1];
 
-				next[nt][nx] = ruCornerValue  / ruCorner[1][1];;
+				next[nx1][nx2] = ruCornerValue  / ruCorner[1][1];;
 			};
 
 			//norm
@@ -245,16 +245,13 @@ namespace Elliptic
 				std::swap(prevSolution, nextSolution);
 
 				firstLayerStep();
-				for (i = 1; i < nt; i++)
+				for (i = 1; i < nx1; i++)
 				{		
 					innerLayerStep();
 				}
 				lastLayerStep();
 			}
 			while (norm() > eps && iterations < iterationLimit);
-
-			//TODO: remove this
-			std::cout << iterations << std::endl;
 
 			return SolutionT(std::move(*nextSolution));
 		}
@@ -284,7 +281,7 @@ namespace Elliptic
 			, class LeftUpperCorner , class LeftUpperFunction
 		>
 		SolutionT solve(
-			int nt, int nx, Scalar eps, int iterationLimit
+			int nx1, int nx2, Scalar eps, int iterationLimit
 
 			, Equation&&                 equation, Function&&                     function
 
@@ -300,7 +297,7 @@ namespace Elliptic
 		)
 		{
 			//common parameters
-			auto solution = SolutionT(nt + 1, nx + 1, 0.0);
+			auto solution = SolutionT(nx1 + 1, nx2 + 1, 0.0);
 
 			int i = 0;
 
@@ -329,7 +326,7 @@ namespace Elliptic
 
 
 				//lower bound
-				for (int j = 1; j < nx; j++)
+				for (int j = 1; j < nx2; j++)
 				{
 					auto lBound      = lowerBound(j);
 					auto lBoundValue = lowerBoundFunction(j);
@@ -350,15 +347,15 @@ namespace Elliptic
 				auto rlCorner      = rightLowerCorner();
 				auto rlCornerValue = rightLowerFunction();
 
-				prev = solution[0][nx];
+				prev = solution[0][nx2];
 
 				rlCornerValue -=
-					+ solution[1][nx - 1] * rlCorner[2][0] + solution[1][nx] * rlCorner[2][1] 
-					+ solution[0][nx - 1] * rlCorner[1][0];
+					+ solution[1][nx2 - 1] * rlCorner[2][0] + solution[1][nx2] * rlCorner[2][1] 
+					+ solution[0][nx2 - 1] * rlCorner[1][0];
 
-				solution[0][nx] = rlCornerValue  / rlCorner[1][1];
+				solution[0][nx2] = rlCornerValue  / rlCorner[1][1];
 
-				norm = std::max(norm, std::abs(prev - solution[0][nx]));
+				norm = std::max(norm, std::abs(prev - solution[0][nx2]));
 			};
 
 
@@ -382,7 +379,7 @@ namespace Elliptic
 
 
 				//inner
-				for (int j = 1; j < nx; j++)
+				for (int j = 1; j < nx2; j++)
 				{
 					auto inner      = equation(i, j);
 					auto innerValue = function(i, j);
@@ -404,16 +401,16 @@ namespace Elliptic
 				auto rBound      = rightBound(i);
 				auto rBoundValue = rightBoundFunction(i);
 
-				prev = solution[i][nx];
+				prev = solution[i][nx2];
 
 				rBoundValue -= 
-					+ solution[i + 1][nx - 1] * rBound[2][0] + solution[i + 1][nx] * rBound[2][1]
-					+ solution[i    ][nx - 1] * rBound[1][0] + 
-					+ solution[i - 1][nx - 1] * rBound[0][0] + solution[i - 1][nx] * rBound[0][1];
+					+ solution[i + 1][nx2 - 1] * rBound[2][0] + solution[i + 1][nx2] * rBound[2][1]
+					+ solution[i    ][nx2 - 1] * rBound[1][0] + 
+					+ solution[i - 1][nx2 - 1] * rBound[0][0] + solution[i - 1][nx2] * rBound[0][1];
 
-				solution[i][nx] = rBoundValue / rBound[1][1];
+				solution[i][nx2] = rBoundValue / rBound[1][1];
 
-				norm = std::max(norm, std::abs(prev - solution[i][nx]));
+				norm = std::max(norm, std::abs(prev - solution[i][nx2]));
 			};
 
 
@@ -424,32 +421,32 @@ namespace Elliptic
 				auto luCorner      = leftUpperCorner();
 				auto luCornerValue = leftUpperFunction();
 
-				prev = solution[nt][0];
+				prev = solution[nx1][0];
 
 				luCornerValue -=
-					+ solution[nt    ][1] * luCorner[1][2] 
-					+ solution[nt - 1][0] * luCorner[0][1] + solution[nt - 1][1] * luCorner[0][2];
+					+ solution[nx1    ][1] * luCorner[1][2] 
+					+ solution[nx1 - 1][0] * luCorner[0][1] + solution[nx1 - 1][1] * luCorner[0][2];
 
-				solution[nt][0] = luCornerValue / luCorner[1][1];
+				solution[nx1][0] = luCornerValue / luCorner[1][1];
 
-				norm = std::max(norm, std::abs(prev - solution[nt][0]));
+				norm = std::max(norm, std::abs(prev - solution[nx1][0]));
 
 
 				// upper bound
-				for (int j = 1; j < nx; j++)
+				for (int j = 1; j < nx2; j++)
 				{
 					auto uBound      = upperBound(j);
 					auto uBoundValue = upperBoundFunction(j);
 
-					prev = solution[nt][j];
+					prev = solution[nx1][j];
 
 					uBoundValue -= 
-						+ solution[nt    ][j - 1] * uBound[1][0] +                                    + solution[nt    ][j + 1] * uBound[1][2] 
-						+ solution[nt - 1][j - 1] * uBound[0][0] + solution[nt - 1][j] * uBound[0][1] + solution[nt - 1][j + 1] * uBound[0][2];
+						+ solution[nx1    ][j - 1] * uBound[1][0] +                                    + solution[nx1    ][j + 1] * uBound[1][2] 
+						+ solution[nx1 - 1][j - 1] * uBound[0][0] + solution[nx1 - 1][j] * uBound[0][1] + solution[nx1 - 1][j + 1] * uBound[0][2];
 
-					solution[nt][j] = uBoundValue / uBound[1][1];
+					solution[nx1][j] = uBoundValue / uBound[1][1];
 
-					norm = std::max(norm, std::abs(prev - solution[nt][j]));
+					norm = std::max(norm, std::abs(prev - solution[nx1][j]));
 				}
 
 
@@ -457,15 +454,15 @@ namespace Elliptic
 				auto ruCorner      = rightUpperCorner();
 				auto ruCornerValue = rightUpperFunction();
 
-				prev = solution[nt][nx];
+				prev = solution[nx1][nx2];
 
 				ruCornerValue -= 
-					+ solution[nt    ][nx - 1] * ruCorner[1][0] + 
-					+ solution[nt - 1][nx - 1] * ruCorner[0][0] + solution[nt - 1][nx] * ruCorner[0][1];
+					+ solution[nx1    ][nx2 - 1] * ruCorner[1][0] + 
+					+ solution[nx1 - 1][nx2 - 1] * ruCorner[0][0] + solution[nx1 - 1][nx2] * ruCorner[0][1];
 
-				solution[nt][nx] = ruCornerValue / ruCorner[1][1];
+				solution[nx1][nx2] = ruCornerValue / ruCorner[1][1];
 
-				norm = std::max(norm, std::abs(prev - solution[nt][nx]));
+				norm = std::max(norm, std::abs(prev - solution[nx1][nx2]));
 			};
 
 
@@ -477,7 +474,7 @@ namespace Elliptic
 				norm = static_cast<Scalar>(0);
 
 				firstLayerStep();
-				for (i = 1; i < nt; i++)
+				for (i = 1; i < nx1; i++)
 				{		
 					innerLayerStep();
 				}
@@ -529,7 +526,7 @@ namespace Elliptic
 			, class LeftUpperCorner , class LeftUpperFunction
 		>
 		SolutionT solve(
-			int nt, int nx, Scalar eps, int iterationLimit
+			int nx1, int nx2, Scalar eps, int iterationLimit
 
 			, Equation&&                 equation, Function&&                     function
 
@@ -545,7 +542,7 @@ namespace Elliptic
 		)
 		{
 			//common parameters
-			auto solution = SolutionT(nt + 1, nx + 1, 0.0);
+			auto solution = SolutionT(nx1 + 1, nx2 + 1, 0.0);
 
 			int i = 0;
 
@@ -576,7 +573,7 @@ namespace Elliptic
 
 
 				//lower bound
-				for (int j = 1; j < nx; j++)
+				for (int j = 1; j < nx2; j++)
 				{
 					auto lBound      = lowerBound(j);
 					auto lBoundValue = lowerBoundFunction(j);
@@ -597,15 +594,15 @@ namespace Elliptic
 				auto rlCorner      = rightLowerCorner();
 				auto rlCornerValue = rightLowerFunction();
 
-				prev = solution[0][nx];
+				prev = solution[0][nx2];
 
 				rlCornerValue -=
-					+ solution[1][nx - 1] * rlCorner[2][0] + solution[1][nx] * rlCorner[2][1] 
-					+ solution[0][nx - 1] * rlCorner[1][0];
+					+ solution[1][nx2 - 1] * rlCorner[2][0] + solution[1][nx2] * rlCorner[2][1] 
+					+ solution[0][nx2 - 1] * rlCorner[1][0];
 
-				solution[0][nx] = rlCornerValue * w / rlCorner[1][1] + solution[0][nx] * (static_cast<Scalar>(1) - w);
+				solution[0][nx2] = rlCornerValue * w / rlCorner[1][1] + solution[0][nx2] * (static_cast<Scalar>(1) - w);
 
-				norm = std::max(norm, std::abs(prev - solution[0][nx]));
+				norm = std::max(norm, std::abs(prev - solution[0][nx2]));
 			};
 
 
@@ -629,7 +626,7 @@ namespace Elliptic
 
 
 				//inner
-				for (int j = 1; j < nx; j++)
+				for (int j = 1; j < nx2; j++)
 				{
 					auto inner      = equation(i, j);
 					auto innerValue = function(i, j);
@@ -651,16 +648,16 @@ namespace Elliptic
 				auto rBound      = rightBound(i);
 				auto rBoundValue = rightBoundFunction(i);
 
-				prev = solution[i][nx];
+				prev = solution[i][nx2];
 
 				rBoundValue -= 
-					+ solution[i + 1][nx - 1] * rBound[2][0] + solution[i + 1][nx] * rBound[2][1]
-					+ solution[i    ][nx - 1] * rBound[1][0] + 
-					+ solution[i - 1][nx - 1] * rBound[0][0] + solution[i - 1][nx] * rBound[0][1];
+					+ solution[i + 1][nx2 - 1] * rBound[2][0] + solution[i + 1][nx2] * rBound[2][1]
+					+ solution[i    ][nx2 - 1] * rBound[1][0] + 
+					+ solution[i - 1][nx2 - 1] * rBound[0][0] + solution[i - 1][nx2] * rBound[0][1];
 
-				solution[i][nx] = rBoundValue * w / rBound[1][1] + solution[i][nx] * (static_cast<Scalar>(1) - w);
+				solution[i][nx2] = rBoundValue * w / rBound[1][1] + solution[i][nx2] * (static_cast<Scalar>(1) - w);
 
-				norm = std::max(norm, std::abs(prev - solution[i][nx]));
+				norm = std::max(norm, std::abs(prev - solution[i][nx2]));
 			};
 
 
@@ -671,31 +668,31 @@ namespace Elliptic
 				auto luCorner      = leftUpperCorner();
 				auto luCornerValue = leftUpperFunction();
 
-				prev = solution[nt][0];
+				prev = solution[nx1][0];
 
 				luCornerValue -=
-					+ solution[nt    ][1] * luCorner[1][2] 
-					+ solution[nt - 1][0] * luCorner[0][1] + solution[nt - 1][1] * luCorner[0][2];
+					+ solution[nx1    ][1] * luCorner[1][2] 
+					+ solution[nx1 - 1][0] * luCorner[0][1] + solution[nx1 - 1][1] * luCorner[0][2];
 
-				solution[nt][0] = luCornerValue * w / luCorner[1][1] + solution[nt][0] * (static_cast<Scalar>(1) - w);
+				solution[nx1][0] = luCornerValue * w / luCorner[1][1] + solution[nx1][0] * (static_cast<Scalar>(1) - w);
 
-				norm = std::max(norm, std::abs(prev - solution[nt][0]));
+				norm = std::max(norm, std::abs(prev - solution[nx1][0]));
 
 				// upper bound
-				for (int j = 1; j < nx; j++)
+				for (int j = 1; j < nx2; j++)
 				{
 					auto uBound      = upperBound(j);
 					auto uBoundValue = upperBoundFunction(j);
 
-					prev = solution[nt][j];
+					prev = solution[nx1][j];
 
 					uBoundValue -= 
-						+ solution[nt    ][j - 1] * uBound[1][0] +                                    + solution[nt    ][j + 1] * uBound[1][2] 
-						+ solution[nt - 1][j - 1] * uBound[0][0] + solution[nt - 1][j] * uBound[0][1] + solution[nt - 1][j + 1] * uBound[0][2];
+						+ solution[nx1    ][j - 1] * uBound[1][0] +                                    + solution[nx1    ][j + 1] * uBound[1][2] 
+						+ solution[nx1 - 1][j - 1] * uBound[0][0] + solution[nx1 - 1][j] * uBound[0][1] + solution[nx1 - 1][j + 1] * uBound[0][2];
 
-					solution[nt][j] = uBoundValue * w / uBound[1][1] + solution[nt][j] * (static_cast<Scalar>(1) - w);
+					solution[nx1][j] = uBoundValue * w / uBound[1][1] + solution[nx1][j] * (static_cast<Scalar>(1) - w);
 
-					norm = std::max(norm, std::abs(prev - solution[nt][j]));
+					norm = std::max(norm, std::abs(prev - solution[nx1][j]));
 				}
 
 
@@ -703,15 +700,15 @@ namespace Elliptic
 				auto ruCorner      = rightUpperCorner();
 				auto ruCornerValue = rightUpperFunction();
 
-				prev = solution[nt][nx];
+				prev = solution[nx1][nx2];
 
 				ruCornerValue -= 
-					+ solution[nt    ][nx - 1] * ruCorner[1][0] + 
-					+ solution[nt - 1][nx - 1] * ruCorner[0][0] + solution[nt - 1][nx] * ruCorner[0][1];
+					+ solution[nx1    ][nx2 - 1] * ruCorner[1][0] + 
+					+ solution[nx1 - 1][nx2 - 1] * ruCorner[0][0] + solution[nx1 - 1][nx2] * ruCorner[0][1];
 
-				solution[nt][nx] = ruCornerValue * w / ruCorner[1][1] + solution[nt][nx] * (static_cast<Scalar>(1) - w);
+				solution[nx1][nx2] = ruCornerValue * w / ruCorner[1][1] + solution[nx1][nx2] * (static_cast<Scalar>(1) - w);
 
-				norm = std::max(norm, std::abs(prev - solution[nt][nx]));
+				norm = std::max(norm, std::abs(prev - solution[nx1][nx2]));
 			};
 
 
@@ -730,7 +727,7 @@ namespace Elliptic
 				norm = static_cast<Scalar>(0);
 
 				firstLayerStep();
-				for (i = 1; i < nt; i++)
+				for (i = 1; i < nx1; i++)
 				{		
 					innerLayerStep();
 				}
