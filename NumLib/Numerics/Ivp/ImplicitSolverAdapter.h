@@ -27,14 +27,14 @@ namespace Num
 		public:
 			template<class Function>
 			Value solve(
-				  Function&& func
+				Function&& func
 				, const Argument& arg0
 				, const Value& val0
 				, const Argument& h
 			)
 			{
 				return m_solver.solve(
-					  std::forward<Function>(func)
+					std::forward<Function>(func)
 					, Num::Ivp::make_diff_jacobian<JacobianVecType, JacobianMatType>(func, h)
 					, arg0
 					, val0
@@ -46,6 +46,12 @@ namespace Num
 		private:
 			ImplicitSolver m_solver;
 		};
+
+		template<class Argument, class Value, class ImplicitSolver>
+		auto make_implicit_adapter(ImplicitSolver&& solver)
+		{
+			return ImplicitSolverAdapter<Argument, Value, ImplicitSolver>(std::forward<ImplicitSolver>(solver));
+		}
 	}
 }
 
