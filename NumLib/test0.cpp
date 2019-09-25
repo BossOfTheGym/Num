@@ -5,8 +5,18 @@
 #include "Numerics/Equ/Utils.h"
 
 
+template<class A>
+struct Test
+{
+	using AA = A;
+
+	using Ret = std::invoke_result_t<decltype(std::declval<A>())>;
+};
+
 int main()
 {
+	Test<int(double)> a;
+
 	using Vec = Num::Arg::VecN<double, 2>;
 	using Mat = Num::Arg::MatNxM<double, 2, 2>;
 

@@ -322,7 +322,7 @@ namespace Num
 		}
 
 
-		//TODO: add specialization for SYSTEM_ORDER = 1
+		//TODO: add adapter for SYSTEM_ORDER = 1
         //unified for both Scalar & System
         template<
 			  int SYSTEM_ORDER
@@ -376,7 +376,7 @@ namespace Num
         };
 
 
-		//TODO: add specialization for SYSTEM_ORDER = 1
+		//TODO: add adapter for SYSTEM_ORDER = 1
         //unified for both Scalar & System
 		template<
 			  int SYSTEM_ORDER
@@ -389,6 +389,11 @@ namespace Num
 		>
         class RungeKuttaImplicit
         {
+		public:
+			using JacobianVecType = VectorType<Argument, SYSTEM_ORDER>;
+			using JacobianMatType = MatrixType<Argument, SYSTEM_ORDER, SYSTEM_ORDER>;
+
+
         public:
 			RungeKuttaImplicit(
 				  Tableau&& tableau
@@ -535,18 +540,6 @@ namespace Num
 
 
 				return val0 + h * sum;
-			}
-
-
-		public:
-			Solver&  solver()
-			{
-				return m_solver;
-			}
-
-			Tableau& tableau()
-			{
-				return m_tableau;
 			}
 
 

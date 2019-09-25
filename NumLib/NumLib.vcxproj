@@ -26,6 +26,7 @@
     <ClInclude Include="Numerics\Equ\FixedPoint.h" />
     <ClInclude Include="Numerics\Equ\Neuton.h" />
     <ClInclude Include="Numerics\Ivp\Common.h" />
+    <ClInclude Include="Numerics\Ivp\ImplicitSolverAdapter.h" />
     <ClInclude Include="Numerics\Ivp\RungeKutta.h" />
     <ClInclude Include="Numerics\LinAlg\Common.h" />
     <ClInclude Include="Numerics\LinAlg\Gauss.h" />
