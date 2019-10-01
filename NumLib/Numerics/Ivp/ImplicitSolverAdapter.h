@@ -50,7 +50,9 @@ namespace Num
 		template<class Argument, class Value, class ImplicitSolver>
 		auto make_implicit_adapter(ImplicitSolver&& solver)
 		{
-			return ImplicitSolverAdapter<Argument, Value, ImplicitSolver>(std::forward<ImplicitSolver>(solver));
+			using ImplicitSolverType = std::remove_reference_t<ImplicitSolver>;
+
+			return ImplicitSolverAdapter<Argument, Value, ImplicitSolverType>(std::forward<ImplicitSolver>(solver));
 		}
 	}
 }

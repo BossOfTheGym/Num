@@ -337,7 +337,9 @@ namespace Num
 			using Vector   = VectorType<Value, Tableau::ORDER>;
 
 		public:
-			RungeKuttaExplicit(Tableau&& tableau) : m_tableau(std::forward<Tableau>(tableau))
+			template<class TableauType>
+			RungeKuttaExplicit(TableauType&& tableau) 
+				: m_tableau(std::forward<TableauType>(tableau))
 			{}
 
 			template<class Function>
@@ -376,6 +378,24 @@ namespace Num
         };
 
 
+		template<
+			  int SYSTEM_ORDER
+			, class Argument
+			, class Value
+			, class Tableau
+			, template<class Scalar, int SIZE> class VectorType = Arg::VecN
+		>
+		auto make_rke_solver(Tableau&& tableau)
+		{
+			using TableauType = std::remove_reference_t<Tableau>;
+
+			return RungeKuttaExplicit<SYSTEM_ORDER, Argument, Value, TableauType, VectorType>(
+				std::forward<Tableau>(tableau)
+			);
+		}
+
+
+
 		//TODO: add adapter for SYSTEM_ORDER = 1
         //unified for both Scalar & System
 		template<
@@ -395,13 +415,14 @@ namespace Num
 
 
         public:
+			template<class TableauType, class ArgumentType>
 			RungeKuttaImplicit(
-				  Tableau&& tableau
-				, Argument&& eps
+				  TableauType&& tableau
+				, ArgumentType&& eps
 				, int iterationsLimit
 			) 
-				: m_tableau(std::forward<Tableau>(tableau))
-				, m_solver(iterationsLimit, eps)
+				: m_tableau(std::forward<TableauType>(tableau))
+				, m_solver(iterationsLimit, std::forward<ArgumentType>(eps))
 			{}
 
 
@@ -548,5 +569,26 @@ namespace Num
 			Tableau m_tableau;
         };
 
+
+		template<
+			  int SYSTEM_ORDER
+			, class Argument
+			, class Value   
+			, class Eps
+			, class Tableau
+			, class Solver  = Equ::NeutonSystem<Argument, Tableau::ORDER * SYSTEM_ORDER>
+			, template<class Scalar, int SIZE>           class VectorType = Arg::VecN
+			, template<class Scalar, int COLS, int ROWS> class MatrixType = Arg::MatNxM
+		>
+		auto make_rki_solver(Tableau&& tableau, Eps&& eps, int iterationsLimit)
+		{
+			using TableauType = std::remove_reference_t<Tableau>;
+
+			return RungeKuttaImplicit<SYSTEM_ORDER, Argument, Value, TableauType, Solver, VectorType, MatrixType>(
+				  std::forward<Tableau>(tableau)
+				, std::forward<Eps>(eps)
+				, iterationsLimit
+			);
+		}
     }
 }
