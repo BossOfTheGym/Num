@@ -75,6 +75,9 @@
     <ClInclude Include="Numerics\Ivp\ImplicitSolverAdapter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Numerics\Ivp\Utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="test0.cpp">

@@ -17,10 +17,10 @@ namespace Num
 		class DiffDerivative : public Function
 		{
 		public:
-			template<class FuncType>
-			DiffDerivative(FuncType&& function, const Value& eps) 
+			template<class FuncType, class EpsType>
+			DiffDerivative(FuncType function, EpsType& eps) 
 				: Function(std::forward<FuncType>(function))
-				, mEps(eps)
+				, mEps(std::forward<EpsType>(eps))
 			{}
 
 			DiffDerivative(const DiffDerivative& deriv) = default;
@@ -55,25 +55,22 @@ namespace Num
 		template< class Vector, class Matrix, class Function>
 		class DiffJacobian : public Function
 		{
+		public:
 			static_assert(Vector::SIZE == Matrix::COLS && Vector::SIZE == Matrix::ROWS, "Non-matching sizes");
 
-
-		public:
 			using Scalar = typename Vector::Scalar;
 
 
 		public:
 			template<class FuncType, class EpsType>
-			DiffJacobian(FuncType&& function, EpsType& eps) 
+			DiffJacobian(FuncType function, EpsType eps) 
 				: Function(std::forward<FuncType>(function))
 				, mEps(std::forward<EpsType>(eps))
 			{}
 
-			DiffJacobian(const DiffJacobian& dj) = default;
-			DiffJacobian(DiffJacobian&& dj)      = default;
 
-
-			Matrix operator() (const Scalar& arg, const Vector& val)
+		public:
+			Matrix operator() (const Scalar& arg, const Vector& val) const
 			{
 				const int N = Vector::SIZE;
 
@@ -93,7 +90,9 @@ namespace Num
 		template<class Vector, class Matrix, class Eps, class Function>
 		auto make_diff_jacobian(Function&& function, Eps&& eps)
 		{
-			return DiffJacobian<Vector, Matrix, std::remove_reference_t<std::remove_cv_t<Function>>>(
+			using FunctionType = std::remove_reference_t<std::remove_cv_t<Function>>;
+
+			return DiffJacobian<Vector, Matrix, FunctionType>(
 				std::forward<Function>(function), std::forward<Eps>(eps)
 			);
 		}

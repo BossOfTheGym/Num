@@ -576,7 +576,7 @@ namespace Num
 			, class Value   
 			, class Eps
 			, class Tableau
-			, class Solver  = Equ::NeutonSystem<Argument, Tableau::ORDER * SYSTEM_ORDER>
+			, class Solver  = Equ::NeutonSystem<Argument, std::remove_reference_t<Tableau>::ORDER * SYSTEM_ORDER>
 			, template<class Scalar, int SIZE>           class VectorType = Arg::VecN
 			, template<class Scalar, int COLS, int ROWS> class MatrixType = Arg::MatNxM
 		>
