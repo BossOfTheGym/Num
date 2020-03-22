@@ -5,7 +5,7 @@
 #include "Numerics/Equ/Utils.h"
 #include "Numerics/Ivp/Utils.h"
 #include "Numerics/Ivp/RungeKutta.h"
-#include "Numerics/Ivp/ImplicitSolverAdapter.h"
+#include "Numerics/Ivp/ImplicitSolverAdaptor.h"
 
 
 void testIvpUtils()

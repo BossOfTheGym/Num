@@ -72,10 +72,13 @@
     <ClInclude Include="Numerics\Utils\Utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Numerics\Ivp\ImplicitSolverAdapter.h">
+    <ClInclude Include="Numerics\Ivp\Utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Numerics\Ivp\Utils.h">
+    <ClInclude Include="Numerics\Ivp\ImplicitSolverAdaptor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Numerics\Equ\Utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
