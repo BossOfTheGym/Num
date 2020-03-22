@@ -1,7 +1,4 @@
-#ifndef Utility_h
-#define Utility_h
+#pragma once
 
 #include "Rect.h"
 #include "Template.h"
-
-#endif

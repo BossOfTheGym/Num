@@ -10,15 +10,11 @@ namespace Num
 {
     namespace Equ
     {
-        template<class Value>
-        using Root = std::pair<Value, int>;
-
-
         const int DEFAULT_ITERATIONS_LIMIT = 10;
 
 
         template<class Vector>
-        using DefaultNorm = Utils::Norm<Vector, Utils::NormType::OCTO>;
+        using DefaultNorm = Utils::Norm<Vector, Utils::NormType::Octo>;
 
 
         template<class Value>
@@ -33,9 +29,9 @@ namespace Num
                 , m_eps(eps)
             {}
 
-            IterativeSolverBase(const IterativeSolverBase& isb) = default;
+            IterativeSolverBase(const IterativeSolverBase&) = default;
 
-            IterativeSolverBase(IterativeSolverBase&& isb) = default;
+            IterativeSolverBase(IterativeSolverBase&&) = default;
 
 
 

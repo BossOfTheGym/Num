@@ -13,50 +13,13 @@ namespace Num
 {
     namespace Equ
     {
-        template<class Value>
-        class NeutonScalar : public IterativeSolverBase<Value>
-        {
-        public:
-            using Base = IterativeSolverBase<Value>;
-            using Base::Base;
-            using Base::limit;
-            using Base::eps;
-
-
-			template<class Function, class Derivative>
-            Root<Value> solve(
-                  Function&& func
-                , Derivative&& deriv
-                , const Value& start
-            )
-            {
-				Value xPrev;
-				Value xNext;
-
-                int iterations = 0;
-
-                xNext = start;
-                do
-                {
-                    iterations++;
-
-                    xPrev = xNext;
-
-                    xNext = xPrev - func(xPrev) / deriv(xPrev);
-                } while (abs(xNext - xPrev) > eps() && iterations < limit());
-
-                return {xNext, iterations};
-            }
-        };
-
-
         template<
               class ScalarType
             , int N
+            , class Norm
             , template<class Scalar = ScalarType, int ROWS = N, int COLS = N> class MatrixType = Arg::MatNxM
             , template<class Scalar = ScalarType, int SIZE = N> class VectorType = Arg::VecN
             , class Solver = LinAlg::GaussEliminationSingle<ScalarType, N>
-            , class Norm   = DefaultNorm<VectorType<ScalarType, N>>
         >
         class NeutonSystem : public IterativeSolverBase<ScalarType>
         {
@@ -85,10 +48,10 @@ namespace Num
 
 		public:
 			template<class Function, class Jacobian>
-            Root<Vector> solve(
+            Vector solve(
                   Function&& func
                 , Jacobian&& jacobian
-                , Vector&& start
+                , const Vector& start
             )
             {
                 Vector xPrev;
@@ -115,13 +78,8 @@ namespace Num
                     xNext = xPrev + delta;
                 } while (m_norm(delta) > eps() && iterations < limit());
 
-                return {xNext, iterations};
+                return xNext;
             }
-
-			Norm& getNorm()
-			{
-				return m_norm;
-			}
 
 
         private:
@@ -129,5 +87,50 @@ namespace Num
             Norm   m_norm;
         };
 
+
+        template<class Argument, class Norm>
+        class NeutonScalar : public IterativeSolverBase<Argument>
+        {
+        public:
+            using SystemSolver = NeutonSystem<Argument, 1, Norm>;
+
+            using Base = IterativeSolverBase<Argument>;
+            using Base::limit;
+            using Base::eps;
+
+            using Scalar = typename SystemSolver::ScalarType;
+            using Matrix = typename SystemSolver::MatrixType;
+            using Vector = typename SystemSolver::VectorType;
+
+
+        public:
+            NeutonScalar() : Base(), m_solver()
+            {}
+
+            NeutonScalar(int iterationsLimit, Scalar eps = EPS<Scalar>) 
+                : Base(iterationsLimit, eps)
+                , m_solver(iterationsLimit, eps)
+            {}
+
+        public:
+            template<class Function, class Derivative>
+            Argument solve(Function&& func, Derivative&& deriv, const Argument& start)
+            {
+                auto wrappedFunc = [&] (const Vector& arg)
+                {
+                    return Vector(func(arg[0]));
+                };
+
+                auto wrappedJacob = [&] (const Vector& arg)
+                {
+                    return Matrix(deriv(arg[0]));
+                };
+
+                return m_solver.solve(wrappedFunc, wrappedJacob, Vector(start))[0];
+            }
+
+        private:
+            SystemSolver m_solver;
+        };
     }
 }

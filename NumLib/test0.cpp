@@ -20,7 +20,7 @@ void testIvpUtils()
 		return t * u * u;
 	};
 
-	auto jacob = Num::Ivp::make_diff_derivative<double, double>(func, 1e-5);
+	auto jacob = Num::Ivp::make_diff_derivative<double>(func, 1e-5);
 
 	auto f = [&] (double t)
 	{
@@ -30,9 +30,11 @@ void testIvpUtils()
 	auto deriv = Num::Equ::make_diff_derivative(f, 1e-6);
 
 	output << "---Ivp utils test---" << std::endl;
-	output << jacob(1.0, 5.0) << std::endl;
-	output << deriv(2.0) << std::endl;
+	output << jacob(1.0, 5.0)[0][0] << std::endl;
+	output << deriv(2.0)[0][0] << std::endl;
 	output << "---Ivp utils test finished" << std::endl << std::endl;
+
+	std::cout << output.str();
 }
 
 void testRke()
@@ -74,7 +76,7 @@ void testRki()
 	auto solver = Num::Ivp::make_rki_solver<1, double, Vec>(
 		Num::Ivp::ImplicitMethods<double>::midpoint2(), 1e-12, 20
 	);
-	auto adapter = Num::Ivp::make_implicit_adapter<double, Vec>(solver);
+	auto adapter = Num::Ivp::make_implicit_adaptor<double, Vec>(solver);
 
 	double h = 0.0001;
 	double t0 = 0.0;

@@ -96,9 +96,12 @@ namespace Num
 
             void permute(int first, int second)
             {
-                std::swap(m_permutation[first], m_permutation[second]);
+                if (first != second)
+                {
+                    std::swap(m_permutation[first], m_permutation[second]);
 
-                m_parity ^= 1;
+                    m_parity ^= 1;
+                }
             }
 
             void reset()

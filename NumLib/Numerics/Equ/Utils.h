@@ -9,43 +9,8 @@ namespace Num
 {
 	namespace Equ
 	{
-		template<class Value, class Function>
-		class DiffDerivative : public Function
-		{
-		public:
-			template<class FuncType, class ValueType>
-			DiffDerivative(FuncType&& function, ValueType&& eps) 
-				: Function(std::forward<FuncType>(function))
-				, mEps(std::forward<ValueType>(eps))
-			{}
-
-			DiffDerivative(const DiffDerivative& deriv) = default;
-			DiffDerivative(DiffDerivative&& deriv)      = default;
-
-
-		public:
-			Value operator()(const Value& arg)
-			{
-				return (Function::operator()(arg + mEps) - Function::operator()(arg - mEps)) / (2 * mEps);
-			}
-
-		private:
-			Value mEps;
-		};
-
-		template<class Function, class Value>
-		auto make_diff_derivative(Function&& function, Value&& eps)
-		{
-			return DiffDerivative<
-				  std::remove_cv_t<std::remove_reference_t<Value>>
-				, std::remove_cv_t<std::remove_reference_t<Function>>
-			>(std::forward<Function>(function), std::forward<Value>(eps));
-		}
-
-
-
 		template< class Vector, class Matrix, class Function>
-		class DiffJacobian : public Function
+		class DiffJacobian
 		{
 			static_assert(Vector::SIZE == Matrix::COLS && Vector::SIZE == Matrix::ROWS, "Non-matching sizes");
 
@@ -55,8 +20,8 @@ namespace Num
 		public:
 			template<class FuncType, class ScalarType>
 			DiffJacobian(FuncType&& function, ScalarType&& eps) 
-				: Function(std::forward<FuncType>(function))
-				, mEps(std::forward<ScalarType>(eps))
+				: m_func(std::forward<FuncType>(function))
+				, m_eps(std::forward<ScalarType>(eps))
 			{}
 
 			DiffJacobian(const DiffJacobian&) = default;
@@ -73,15 +38,15 @@ namespace Num
 				{
 					Vector rightArg(arg);
 					Vector  leftArg(arg);
-					rightArg[i] += mEps;
-					leftArg [i] -= mEps;
+					rightArg[i] += m_eps;
+					leftArg [i] -= m_eps;
 
 
-					Vector right = Function::operator()(rightArg);
-					Vector left  = Function::operator()(leftArg);
+					Vector right = m_func(rightArg);
+					Vector left  = m_func(leftArg);
 					for (int j = 0; j < N; j++)
 					{
-						mat[j][i] = (right[j] - left[j]) / (2 * mEps);
+						mat[j][i] = (right[j] - left[j]) / (2 * m_eps);
 					}
 				}
 
@@ -90,17 +55,32 @@ namespace Num
 
 
 		private:
-			Scalar mEps;
+			Function m_func;
+			Scalar m_eps;
 		};
 
 		template<class Vector, class Matrix, class Function, class Eps>
 		auto make_diff_jacobian(Function&& function, Eps&& eps)
 		{
-			return DiffJacobian<
-				  Vector
-				, Matrix
-				, std::remove_reference_t<std::remove_cv_t<Function>>
-			>(std::forward<Function>(function), std::forward<Eps>(eps));
+			using FunctionType = std::remove_reference_t<std::remove_cv_t<Function>>;
+
+			return DiffJacobian<Vector, Matrix, FunctionType>(
+				std::forward<Function>(function), std::forward<Eps>(eps)
+			);
+		}
+
+		template<class Function, class Scalar>
+		auto make_diff_derivative(Function&& function, Scalar&& eps)
+		{
+			using Vec = Num::Arg::VecN<Scalar, 1>;
+			using Mat = Num::Arg::MatNxM<Scalar, 1, 1>;
+
+			auto wrapper = [&] (const Vec& arg)
+			{
+				return Vec(function(arg[0]));
+			};
+			
+			return make_diff_jacobian<Vec, Mat>(wrapper, std::forward<Scalar>(eps));
 		}
 	}
 }

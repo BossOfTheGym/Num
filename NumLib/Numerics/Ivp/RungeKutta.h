@@ -334,7 +334,7 @@ namespace Num
         class RungeKuttaExplicit
         {
         public:
-			using Vector   = VectorType<Value, Tableau::ORDER>;
+			using Vector = VectorType<Value, Tableau::ORDER>;
 
 		public:
 			template<class TableauType>
@@ -396,16 +396,21 @@ namespace Num
 
 
 
-		//TODO: add adapter for SYSTEM_ORDER = 1
-        //unified for both Scalar & System
+		// For systems only
+        // unified for both Scalar & System
+		// TODO : get rid of reinterpret_cast<>, use view(proxy) instead
 		template<
 			  int SYSTEM_ORDER
 			, class Argument
 			, class Value   
 			, class Tableau = ButcherTableau<Argument, 3>
-			, class Solver  = Equ::NeutonSystem<Argument, Tableau::ORDER * SYSTEM_ORDER>
 			, template<class Scalar, int SIZE>           class VectorType = Arg::VecN
 			, template<class Scalar, int COLS, int ROWS> class MatrixType = Arg::MatNxM
+			, class Solver  = Equ::NeutonSystem<
+				  Argument
+				, Tableau::ORDER * SYSTEM_ORDER
+				, Equ::DefaultNorm<VectorType<Argument, SYSTEM_ORDER>>
+			>
 		>
         class RungeKuttaImplicit
         {
@@ -466,10 +471,6 @@ namespace Num
 					return (coefsVec - resultVec);
 				};
 
-
-				//dirty "hack" to reinterpet result as it was matrix 
-				using JacobianResult = MatrixType<Argument, SYSTEM_ORDER, SYSTEM_ORDER>;
-
 				//adjusted jacobian
 				using SpecialJacobian = MatrixType<Argument, Tableau::ORDER * SYSTEM_ORDER, Tableau::ORDER * SYSTEM_ORDER>;
 
@@ -502,9 +503,7 @@ namespace Num
 
 					const KMat& coefsMat = reinterpret_cast<const KMat&>(coefsVec);
 
-
 					SpecialJacobian result;
-
 					for (int blockLine = 0; blockLine < Tableau::ORDER; blockLine++)
 					{
 						Value sums = Value();
@@ -514,9 +513,7 @@ namespace Num
 							sums += mat[blockLine][j] * coefsMat[j];
 						}
 
-
-						auto jacobianResult  = jacobian(arg0 + h * cVec[blockLine], val0 + h * sums);
-						auto& systemJacobian = reinterpret_cast<JacobianResult&>(jacobianResult);
+						auto systemJacobian = jacobian(arg0 + h * cVec[blockLine], val0 + h * sums);
 
 						for (int inBlockLine = 0; inBlockLine < SYSTEM_ORDER; inBlockLine++)
 						{
@@ -533,7 +530,6 @@ namespace Num
 								+= static_cast<Argument>(1.0);
 						}
 					}
-
 					return result;
 				};
 
@@ -548,8 +544,8 @@ namespace Num
 					initialMat[i] = val;
 				}
 
-				auto solution     = m_solver.solve(std::move(specialFunc), std::move(specialJacobian), std::move(initialVec));
-				KMat& solutionMat = reinterpret_cast<KMat&>(solution.first);
+				auto solution     = m_solver.solve(specialFunc, specialJacobian, initialVec);
+				KMat& solutionMat = reinterpret_cast<KMat&>(solution);
 
 
 				//computing result
@@ -576,15 +572,19 @@ namespace Num
 			, class Value   
 			, class Eps
 			, class Tableau
-			, class Solver  = Equ::NeutonSystem<Argument, std::remove_reference_t<Tableau>::ORDER * SYSTEM_ORDER>
 			, template<class Scalar, int SIZE>           class VectorType = Arg::VecN
 			, template<class Scalar, int COLS, int ROWS> class MatrixType = Arg::MatNxM
+			, class Solver  = Equ::NeutonSystem<
+				  Argument
+				, Tableau::ORDER * SYSTEM_ORDER
+				, Equ::DefaultNorm<VectorType<Argument, SYSTEM_ORDER>>
+			>
 		>
 		auto make_rki_solver(Tableau&& tableau, Eps&& eps, int iterationsLimit)
 		{
 			using TableauType = std::remove_reference_t<Tableau>;
 
-			return RungeKuttaImplicit<SYSTEM_ORDER, Argument, Value, TableauType, Solver, VectorType, MatrixType>(
+			return RungeKuttaImplicit<SYSTEM_ORDER, Argument, Value, TableauType, VectorType, MatrixType, Solver>(
 				  std::forward<Tableau>(tableau)
 				, std::forward<Eps>(eps)
 				, iterationsLimit

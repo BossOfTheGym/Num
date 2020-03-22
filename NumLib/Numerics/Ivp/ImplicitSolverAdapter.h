@@ -1,5 +1,4 @@
-#ifndef IMPLICIT_SOLVER_ADAPTER_H
-#define IMPLICIT_SOLVER_ADAPTER_H
+#pragma once
 
 #include "Utils.h"
 
@@ -8,18 +7,19 @@ namespace Num
 	namespace Ivp
 	{
 		template<class Argument, class Value, class ImplicitSolver>
-		class ImplicitSolverAdapter
+		class ImplicitSolverAdaptor
 		{
 		public:
 			using JacobianVecType = typename ImplicitSolver::JacobianVecType;
 			using JacobianMatType = typename ImplicitSolver::JacobianMatType;
 
 		public:
-			ImplicitSolverAdapter(ImplicitSolver&& solver)
-				: m_solver(std::move(solver))
+			template<class ImplicitSolverT>
+			ImplicitSolverAdaptor(ImplicitSolverT solver)
+				: m_solver(std::forward<ImplicitSolverT>(solver))
 			{}
 
-			ImplicitSolverAdapter(const ImplicitSolver& solver)
+			ImplicitSolverAdaptor(const ImplicitSolver& solver)
 				: m_solver(solver)
 			{}
 
@@ -48,13 +48,11 @@ namespace Num
 		};
 
 		template<class Argument, class Value, class ImplicitSolver>
-		auto make_implicit_adapter(ImplicitSolver&& solver)
+		auto make_implicit_adaptor(ImplicitSolver&& solver)
 		{
-			using ImplicitSolverType = std::remove_reference_t<ImplicitSolver>;
+			using ImplicitSolverType = std::remove_reference_t<std::remove_cv_t<ImplicitSolver>>;
 
-			return ImplicitSolverAdapter<Argument, Value, ImplicitSolverType>(std::forward<ImplicitSolver>(solver));
+			return ImplicitSolverAdaptor<Argument, Value, ImplicitSolverType>(std::forward<ImplicitSolver>(solver));
 		}
 	}
 }
-
-#endif

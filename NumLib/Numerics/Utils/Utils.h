@@ -13,16 +13,16 @@ namespace Num
     {
         enum NormType : int
         {
-              CUBE 
-            , OCTO
-            , SPHERE
+              Cube 
+            , Octo
+            , Sphere
         };
 
         template<class Vector, NormType type>
         class Norm;
 
         template<class Vector>
-        class Norm<Vector, CUBE>
+        class Norm<Vector, Cube>
         {
         public:
             using Scalar = typename Vector::Scalar;
@@ -43,7 +43,7 @@ namespace Num
         };
 
         template<class Vector>
-        class Norm<Vector, OCTO>
+        class Norm<Vector, Octo>
         {
         public:
             using Scalar = typename Vector::Scalar;
@@ -63,7 +63,7 @@ namespace Num
         };
 
         template<class Vector>
-        class Norm<Vector, SPHERE>
+        class Norm<Vector, Sphere>
         {
         public:
             using Scalar = typename Vector::Scalar;
@@ -78,7 +78,7 @@ namespace Num
                     value += vec[i] * vec[i];
                 }
 
-                return sqrt(value);
+                return std::sqrt(value);
             }
         };
     }

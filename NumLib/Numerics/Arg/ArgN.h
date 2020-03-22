@@ -39,7 +39,7 @@ namespace Num
             VecN() : m_vec()
             {}
 
-            VecN(Scalar scalar)
+            VecN(Scalar scalar) : m_vec()
             {
                 for (int i = 0; i < N; i++)
                 {
@@ -55,7 +55,7 @@ namespace Num
                 }
             }
 
-            VecN(const VecN& vec)
+            VecN(const VecN& vec) : m_vec()
             {
                 for (int i = 0; i < N; i++)
                 {
@@ -258,7 +258,7 @@ namespace Num
                 }
             }
 
-            MatNxM(Scalar mat[N][M])
+            MatNxM(Scalar mat[N][M]) : m_mat()
             {
                 for (int i = 0; i < N; i++)
                 {
@@ -269,7 +269,7 @@ namespace Num
                 }
             }
 
-            MatNxM(const MatNxM& mat)
+            MatNxM(const MatNxM& mat) : m_mat()
             {
                 for (int i = 0; i < N; i++)
                 {
