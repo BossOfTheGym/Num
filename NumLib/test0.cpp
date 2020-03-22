@@ -95,6 +95,7 @@ void testRki()
 
 int main()
 {
+	// test
 	testRke();
 	testRki();
 	std::cin.get();
