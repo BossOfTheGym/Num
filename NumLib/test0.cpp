@@ -74,7 +74,7 @@ void testRki()
 	};
 
 	auto solver = Num::Ivp::make_rki_solver<1, double, Vec>(
-		Num::Ivp::ImplicitMethods<double>::midpoint2(), 1e-12, 20
+		Num::Ivp::ImplicitMethods<double>::gaussLegendre4(), 1e-12, 20
 	);
 	auto adapter = Num::Ivp::make_implicit_adaptor<double, Vec>(solver);
 

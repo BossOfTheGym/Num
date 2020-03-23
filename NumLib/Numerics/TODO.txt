@@ -1,0 +1,4 @@
+1. Remove template VectorType and MatrixType parameters
+2. Rework GaussElimination: whole current submatrix search -> current column search
+3. Create std::span analogue so I can remove terrible workaround in RKI solver
+4. Rework RKI solver so it no longer has reinterpret_cast

@@ -438,8 +438,7 @@ namespace Num
 				, const Argument& arg0
 				, const Value&    val0
 				, const Argument& h
-			)
-			{
+			){
 				//tableau parameters
 				const auto&[mat, cVec, bVec] = m_tableau;
 
@@ -465,11 +464,15 @@ namespace Num
 						}
 
 						resultMat[i] = func(arg0 + h * cVec[i], val0 + h * sums);
-						
+
 					}
 
 					return (coefsVec - resultVec);
 				};
+
+
+				//dirty "hack" to reinterpet result as it was matrix 
+				using JacobianResult = MatrixType<Argument, SYSTEM_ORDER, SYSTEM_ORDER>;
 
 				//adjusted jacobian
 				using SpecialJacobian = MatrixType<Argument, Tableau::ORDER * SYSTEM_ORDER, Tableau::ORDER * SYSTEM_ORDER>;
@@ -503,7 +506,9 @@ namespace Num
 
 					const KMat& coefsMat = reinterpret_cast<const KMat&>(coefsVec);
 
+
 					SpecialJacobian result;
+
 					for (int blockLine = 0; blockLine < Tableau::ORDER; blockLine++)
 					{
 						Value sums = Value();
@@ -513,7 +518,9 @@ namespace Num
 							sums += mat[blockLine][j] * coefsMat[j];
 						}
 
-						auto systemJacobian = jacobian(arg0 + h * cVec[blockLine], val0 + h * sums);
+
+						auto jacobianResult  = jacobian(arg0 + h * cVec[blockLine], val0 + h * sums);
+						auto& systemJacobian = reinterpret_cast<JacobianResult&>(jacobianResult);
 
 						for (int inBlockLine = 0; inBlockLine < SYSTEM_ORDER; inBlockLine++)
 						{
@@ -530,6 +537,7 @@ namespace Num
 								+= static_cast<Argument>(1.0);
 						}
 					}
+
 					return result;
 				};
 
@@ -577,7 +585,7 @@ namespace Num
 			, class Solver  = Equ::NeutonSystem<
 				  Argument
 				, Tableau::ORDER * SYSTEM_ORDER
-				, Equ::DefaultNorm<VectorType<Argument, SYSTEM_ORDER>>
+				, Equ::DefaultNorm<VectorType<Argument, Tableau::ORDER * SYSTEM_ORDER>>
 			>
 		>
 		auto make_rki_solver(Tableau&& tableau, Eps&& eps, int iterationsLimit)
