@@ -31,7 +31,7 @@ namespace Num
 
 		public:
 			template<class ... Init>
-			VecN(const Init& ... initValues) : m_vec{initValues...}
+			VecN(Init ... initValues) : m_vec{initValues...}
 			{
 				static_assert(sizeof...(Init) == N, "Initialization values count should match vector size");
 			}

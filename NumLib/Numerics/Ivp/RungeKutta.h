@@ -377,7 +377,6 @@ namespace Num
 			Tableau m_tableau;
         };
 
-
 		template<
 			  int SYSTEM_ORDER
 			, class Argument
@@ -394,6 +393,78 @@ namespace Num
 			);
 		}
 
+
+		//TODO: add adapter for SYSTEM_ORDER = 1
+		//unified for both Scalar & System
+		template<
+			int SYSTEM_ORDER
+			, class Argument
+			, class Value
+			, class Tableau = ButcherTableau<Argument, 4>
+			, template<class Scalar, int SIZE> class VectorType = Arg::VecN
+		>
+		class RungeKuttaExplicitGen
+		{
+		public:
+			using Vector = VectorType<Value, Tableau::ORDER>;
+
+		public:
+			template<class TableauType>
+			RungeKuttaExplicitGen(TableauType&& tableau) 
+				: m_tableau(std::forward<TableauType>(tableau))
+			{}
+
+			template<class Function, class Jacobian>
+			Value solve(
+				  Function&& func
+				, Jacobian&& jacobian
+				, const Argument& arg0
+				, const Value& val0
+				, const Argument& h
+				)
+			{
+				const auto&[mat, cVec, bVec] = m_tableau;
+
+				Vector kVec = Vector();
+				for (int i = 0; i < Tableau::ORDER; i++)
+				{
+					for (int j = 0; j < i; j++)
+					{
+						kVec[i] += kVec[j] * mat[i][j];
+					}
+
+					kVec[i] = func(arg0 + h * cVec[i], val0 + h * kVec[i]);
+				}
+
+				Value sum = Value();
+				for (int i = 0; i < Tableau::ORDER; i++)
+				{
+					sum += bVec[i] * kVec[i];
+				}
+
+				return val0 + h * sum;
+			}
+
+
+		private:
+			Tableau m_tableau;
+		};
+
+		template<
+			int SYSTEM_ORDER
+			, class Argument
+			, class Value
+			, class Tableau
+			, template<class Scalar, int SIZE> class VectorType = Arg::VecN
+		>
+		auto make_rkeg_solver(Tableau&& tableau)
+		{
+			using TableauType = std::remove_reference_t<Tableau>;
+
+			return RungeKuttaExplicitGen<SYSTEM_ORDER, Argument, Value, TableauType, VectorType>(
+				std::forward<Tableau>(tableau)
+			);
+		}
 
 
 		// For systems only
