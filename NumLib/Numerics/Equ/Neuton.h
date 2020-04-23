@@ -13,6 +13,9 @@ namespace Num
 {
     namespace Equ
     {
+        template<class Scalar, int N>
+        using neu_sys_norm = Utils::Norm<Arg::VecN<Scalar, N>, Utils::Octo>;
+        
         template<
               class ScalarType
             , int N
@@ -88,6 +91,10 @@ namespace Num
         };
 
 
+        template<class Scalar>
+        using neu_sc_norm = Utils::Norm<Arg::VecN<Scalar, 1>, Utils::Octo>;
+
+
         template<class Argument, class Norm>
         class NeutonScalar : public IterativeSolverBase<Argument>
         {
@@ -98,9 +105,9 @@ namespace Num
             using Base::limit;
             using Base::eps;
 
-            using Scalar = typename SystemSolver::ScalarType;
-            using Matrix = typename SystemSolver::MatrixType;
-            using Vector = typename SystemSolver::VectorType;
+            using Scalar = typename SystemSolver::Scalar;
+            using Matrix = typename SystemSolver::Matrix;
+            using Vector = typename SystemSolver::Vector;
 
 
         public:
